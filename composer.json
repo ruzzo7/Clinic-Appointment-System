@@ -1,0 +1,13 @@
+{
+    "name": "clinic/appointment-system",
+    "description": "Clinic Appointment Scheduling System with Blade templating",
+    "require": {
+        "php": ">=7.4",
+        "jenssegers/blade": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "includes/"
+        }
+    }
+}
