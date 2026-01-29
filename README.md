@@ -315,6 +315,3 @@ This project is created for educational purposes as part of a web development co
 
 Created as a final coursework project for demonstrating PHP, MySQL, and web security concepts.
 
----
-
-**Note**: This is a standalone implementation using Blade templating without the Laravel framework, as requested. All features are implemented from scratch with a focus on security and best practices.
