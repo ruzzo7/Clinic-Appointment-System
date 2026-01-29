@@ -24,12 +24,14 @@
                         <label for="name">Full Name <span class="required">*</span></label>
                         <input type="text" id="name" name="name" class="form-control" 
                                value="{{ $doctor['name'] ?? '' }}" required>
+                        <span class="error-message" id="name-error"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email Address <span class="required">*</span></label>
                         <input type="email" id="email" name="email" class="form-control" 
                                value="{{ $doctor['email'] ?? '' }}" required>
+                        <span class="error-message" id="email-error"></span>
                     </div>
                 </div>
 
@@ -38,6 +40,7 @@
                         <label for="phone">Phone Number <span class="required">*</span></label>
                         <input type="tel" id="phone" name="phone" class="form-control" 
                                value="{{ $doctor['phone'] ?? '' }}" required>
+                        <span class="error-message" id="phone-error"></span>
                     </div>
 
                     <div class="form-group">
@@ -45,6 +48,7 @@
                         <input type="text" id="specialization" name="specialization" class="form-control" 
                                value="{{ $doctor['specialization'] ?? '' }}" 
                                placeholder="e.g., Cardiologist, Pediatrician" required>
+                        <span class="error-message" id="specialization-error"></span>
                     </div>
                 </div>
 
@@ -53,6 +57,7 @@
                     <input type="text" id="qualification" name="qualification" class="form-control" 
                            value="{{ $doctor['qualification'] ?? '' }}" 
                            placeholder="e.g., MBBS, MD" required>
+                    <span class="error-message" id="qualification-error"></span>
                 </div>
 
                 <div class="form-group">
@@ -89,23 +94,80 @@
 
 @section('extra_js')
 <script>
-// Client-side validation
-document.getElementById('doctorForm').addEventListener('submit', function(e) {
-    let isValid = true;
-    
-    // Clear previous errors
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-    
-    // Validate at least one day is selected
-    const checkedDays = document.querySelectorAll('input[name="available_days[]"]:checked');
-    if (checkedDays.length === 0) {
-        document.getElementById('days-error').textContent = 'Please select at least one available day';
-        isValid = false;
-    }
-    
-    if (!isValid) {
-        e.preventDefault();
-    }
+// Initialize live form validation
+const doctorValidator = new FormValidator('doctorForm', {
+    validateOnInput: true,
+    validateOnBlur: true,
+    showSuccessIcons: true,
+    debounceDelay: 300
 });
+
+// Add custom validators
+doctorValidator.addValidator('name', (value) => {
+    if (value.length < 2) {
+        return 'Name must be at least 2 characters long';
+    }
+    if (!/^[a-zA-Z\s.]+$/.test(value)) {
+        return 'Name should only contain letters, spaces, and periods';
+    }
+    return true;
+});
+
+doctorValidator.addValidator('email', (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+        return 'Please enter a valid email address';
+    }
+    return true;
+});
+
+doctorValidator.addValidator('phone', (value) => {
+    const phoneRegex = /^[0-9\-\+\(\)\s]{10,20}$/;
+    if (!phoneRegex.test(value)) {
+        return 'Please enter a valid phone number (10-20 digits)';
+    }
+    return true;
+});
+
+doctorValidator.addValidator('specialization', (value) => {
+    if (value.length < 3) {
+        return 'Specialization must be at least 3 characters long';
+    }
+    return true;
+});
+
+doctorValidator.addValidator('qualification', (value) => {
+    if (value.length < 2) {
+        return 'Qualification must be at least 2 characters long';
+    }
+    return true;
+});
+
+// Validate available days checkboxes
+const checkboxGroup = document.querySelector('.checkbox-group');
+if (checkboxGroup) {
+    checkboxGroup.parentElement.setAttribute('data-validate-checkbox', 'true');
+    
+    const checkboxes = checkboxGroup.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            const errorEl = document.getElementById('days-error');
+            
+            if (anyChecked) {
+                if (errorEl) errorEl.textContent = '';
+            } else {
+                if (errorEl) errorEl.textContent = 'Please select at least one available day';
+            }
+        });
+    });
+}
+
+// Add validation hints
+document.getElementById('name').setAttribute('title', 'Enter doctor\'s full name');
+document.getElementById('email').setAttribute('title', 'Enter a valid email address');
+document.getElementById('phone').setAttribute('title', 'Enter phone number (10-20 digits)');
+document.getElementById('specialization').setAttribute('title', 'e.g., Cardiologist, Pediatrician');
+document.getElementById('qualification').setAttribute('title', 'e.g., MBBS, MD, PhD');
 </script>
 @endsection

@@ -496,15 +496,108 @@ h6 {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-.form-control.error {
+.form-control.error,
+.form-control.invalid {
     border-color: var(--danger-color);
+    background-color: #FEF2F2;
+    animation: shake 0.3s ease-in-out;
 }
 
-.error-message {
+.form-control.valid,
+.form-control.success {
+    border-color: var(--success-color);
+    background-color: #F0FDF4;
+}
+
+/* Validation icons */
+.form-group {
+    position: relative;
+}
+
+.form-group.has-validation .form-control {
+    padding-right: 2.75rem;
+}
+
+.form-group .validation-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 2.5rem;
+    font-size: 1.25rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.form-group.valid .validation-icon.icon-valid,
+.form-group.success .validation-icon.icon-valid {
+    color: var(--success-color);
+    opacity: 1;
+}
+
+.form-group.invalid .validation-icon.icon-invalid,
+.form-group.error .validation-icon.icon-invalid {
+    color: var(--danger-color);
+    opacity: 1;
+}
+
+.error-message,
+.validation-message {
     color: var(--danger-color);
     font-size: 0.875rem;
     margin-top: var(--spacing-xs);
     display: block;
+    min-height: 1.25rem;
+    animation: slideDown 0.2s ease-out;
+}
+
+.success-message {
+    color: var(--success-color);
+    font-size: 0.875rem;
+    margin-top: var(--spacing-xs);
+    display: block;
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Shake animation for invalid inputs */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Focus states with validation */
+.form-control.error:focus,
+.form-control.invalid:focus {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-control.valid:focus,
+.form-control.success:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Live validation hint */
+.validation-hint {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin-top: var(--spacing-xs);
+    display: block;
+}
+
+.validation-hint.active {
+    color: var(--primary-color);
 }
 
 textarea.form-control {

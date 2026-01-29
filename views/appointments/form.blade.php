@@ -180,13 +180,97 @@ document.getElementById('appointment_date').addEventListener('change', checkAvai
 window.addEventListener('load', checkAvailability);
 @endif
 
-// Form validation
-document.getElementById('appointmentForm').addEventListener('submit', function(e) {
-    const timeSelect = document.getElementById('appointment_time');
-    if (!timeSelect.value) {
-        e.preventDefault();
-        alert('Please select an available time slot');
+// Initialize live form validation
+const appointmentValidator = new FormValidator('appointmentForm', {
+    validateOnInput: true,
+    validateOnBlur: true,
+    showSuccessIcons: true,
+    debounceDelay: 300
+});
+
+// Add custom validators
+appointmentValidator.addValidator('patient_id', (value) => {
+    if (!value || value === '') {
+        return 'Please select a patient';
+    }
+    return true;
+});
+
+appointmentValidator.addValidator('doctor_id', (value) => {
+    if (!value || value === '') {
+        return 'Please select a doctor';
+    }
+    return true;
+});
+
+appointmentValidator.addValidator('appointment_date', (value) => {
+    if (!value) {
+        return 'Please select an appointment date';
+    }
+    
+    const selectedDate = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+        return 'Appointment date cannot be in the past';
+    }
+    
+    // Check if date is more than 6 months in future
+    const sixMonthsFromNow = new Date();
+    sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+    
+    if (selectedDate > sixMonthsFromNow) {
+        return 'Appointment date cannot be more than 6 months in the future';
+    }
+    
+    return true;
+});
+
+appointmentValidator.addValidator('appointment_time', (value) => {
+    if (!value || value === '') {
+        return 'Please select an appointment time';
+    }
+    return true;
+});
+
+appointmentValidator.addValidator('reason', (value) => {
+    if (value.length < 10) {
+        return 'Please provide a detailed reason (at least 10 characters)';
+    }
+    if (value.length > 500) {
+        return 'Reason is too long (maximum 500 characters)';
+    }
+    return true;
+});
+
+// Add error message elements if they don't exist
+const formGroups = [
+    { id: 'patient_id', errorId: 'patient-error' },
+    { id: 'doctor_id', errorId: 'doctor-error' },
+    { id: 'appointment_date', errorId: 'date-error' },
+    { id: 'appointment_time', errorId: 'time-error' },
+    { id: 'reason', errorId: 'reason-error' }
+];
+
+formGroups.forEach(({ id, errorId }) => {
+    const field = document.getElementById(id);
+    if (field) {
+        const formGroup = field.closest('.form-group');
+        if (formGroup && !document.getElementById(errorId)) {
+            const errorSpan = document.createElement('span');
+            errorSpan.className = 'error-message';
+            errorSpan.id = errorId;
+            formGroup.appendChild(errorSpan);
+        }
     }
 });
+
+// Add validation hints
+document.getElementById('patient_id').setAttribute('title', 'Select the patient for this appointment');
+document.getElementById('doctor_id').setAttribute('title', 'Select the doctor for this appointment');
+document.getElementById('appointment_date').setAttribute('title', 'Select appointment date');
+document.getElementById('appointment_time').setAttribute('title', 'Select available time slot');
+document.getElementById('reason').setAttribute('title', 'Describe the reason for visit (10-500 characters)');
 </script>
 @endsection

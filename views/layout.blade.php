@@ -78,6 +78,7 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/form-validator.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
     <script>
         function openDeleteModal(url, message) {

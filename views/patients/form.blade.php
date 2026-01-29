@@ -82,59 +82,59 @@
 
 @section('extra_js')
 <script>
-// Client-side validation
-document.getElementById('patientForm').addEventListener('submit', function(e) {
-    let isValid = true;
-    
-    // Clear previous errors
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-    document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
-    
-    // Validate name
-    const name = document.getElementById('name').value.trim();
-    if (name.length < 2) {
-        showError('name', 'Name must be at least 2 characters long');
-        isValid = false;
-    }
-    
-    // Validate email
-    const email = document.getElementById('email').value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showError('email', 'Please enter a valid email address');
-        isValid = false;
-    }
-    
-    // Validate phone
-    const phone = document.getElementById('phone').value.trim();
-    const phoneRegex = /^[0-9\-\+\(\)\s]{10,20}$/;
-    if (!phoneRegex.test(phone)) {
-        showError('phone', 'Please enter a valid phone number');
-        isValid = false;
-    }
-    
-    // Validate date of birth
-    const dob = document.getElementById('date_of_birth').value;
-    if (dob) {
-        const dobDate = new Date(dob);
-        const today = new Date();
-        if (dobDate > today) {
-            showError('dob', 'Date of birth cannot be in the future');
-            isValid = false;
-        }
-    }
-    
-    if (!isValid) {
-        e.preventDefault();
-    }
+// Initialize live form validation
+const patientValidator = new FormValidator('patientForm', {
+    validateOnInput: true,
+    validateOnBlur: true,
+    showSuccessIcons: true,
+    debounceDelay: 300
 });
 
-function showError(fieldId, message) {
-    const errorEl = document.getElementById(fieldId + '-error');
-    const inputEl = document.getElementById(fieldId === 'dob' ? 'date_of_birth' : fieldId);
+// Add custom validators
+patientValidator.addValidator('name', (value) => {
+    if (value.length < 2) {
+        return 'Name must be at least 2 characters long';
+    }
+    if (!/^[a-zA-Z\s]+$/.test(value)) {
+        return 'Name should only contain letters and spaces';
+    }
+    return true;
+});
+
+patientValidator.addValidator('email', (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+        return 'Please enter a valid email address';
+    }
+    return true;
+});
+
+patientValidator.addValidator('phone', (value) => {
+    const phoneRegex = /^[0-9\-\+\(\)\s]{10,20}$/;
+    if (!phoneRegex.test(value)) {
+        return 'Please enter a valid phone number (10-20 digits)';
+    }
+    return true;
+});
+
+patientValidator.addValidator('date_of_birth', (value) => {
+    const dob = new Date(value);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
     
-    if (errorEl) errorEl.textContent = message;
-    if (inputEl) inputEl.classList.add('error');
-}
+    if (dob > today) {
+        return 'Date of birth cannot be in the future';
+    }
+    if (age > 150) {
+        return 'Please enter a valid date of birth';
+    }
+    return true;
+});
+
+// Add validation hints
+document.getElementById('name').setAttribute('title', 'Enter full name (letters and spaces only)');
+document.getElementById('email').setAttribute('title', 'Enter a valid email address');
+document.getElementById('phone').setAttribute('title', 'Enter phone number (10-20 digits)');
+document.getElementById('date_of_birth').setAttribute('title', 'Select date of birth');
 </script>
 @endsection

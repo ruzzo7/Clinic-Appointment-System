@@ -200,7 +200,7 @@
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="">
+            <form method="POST" action="" id="loginForm">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
                 
                 <div class="form-group">
@@ -213,6 +213,7 @@
                         required 
                         autofocus
                     >
+                    <span class="error-message" id="username-error"></span>
                 </div>
 
                 <div class="form-group">
@@ -224,6 +225,7 @@
                         placeholder="Enter your password"
                         required
                     >
+                    <span class="error-message" id="password-error"></span>
                 </div>
 
                 <button type="submit" class="btn-login">Sign In</button>
@@ -240,5 +242,35 @@
             </div>
         </div>
     </div>
+
+    <script src="<?php echo asset('js/form-validator.js'); ?>"></script>
+    <script>
+        // Initialize live form validation for login
+        const loginValidator = new FormValidator('loginForm', {
+            validateOnInput: true,
+            validateOnBlur: true,
+            showSuccessIcons: false, // Don't show success icons on login form
+            debounceDelay: 300
+        });
+
+        // Add custom validators
+        loginValidator.addValidator('username', (value) => {
+            if (value.length < 3) {
+                return 'Username must be at least 3 characters';
+            }
+            return true;
+        });
+
+        loginValidator.addValidator('password', (value) => {
+            if (value.length < 6) {
+                return 'Password must be at least 6 characters';
+            }
+            return true;
+        });
+
+        // Add validation hints
+        document.getElementById('username').setAttribute('title', 'Enter your username or email');
+        document.getElementById('password').setAttribute('title', 'Enter your password');
+    </script>
 </body>
 </html>
