@@ -307,11 +307,4 @@ This project demonstrates:
 - Session management
 - RESTful-like URL structure
 
-## 📄 License
-
-This project is created for educational purposes as part of a web development course.
-
-## 👨‍💻 Author
-
-Created as a final coursework project for demonstrating PHP, MySQL, and web security concepts.
 
